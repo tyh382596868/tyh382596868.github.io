@@ -1,6 +1,6 @@
 +++
 date = '2025-01-11T00:09:43+08:00'
-<!-- draft = true -->
+
 title = 'My Second Post'
 +++
 ## Introduction
