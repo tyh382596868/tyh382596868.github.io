@@ -127,14 +127,14 @@ title: tyh's notes
 paginate: 5
 theme: [PaperMod]
 
-# enableInlineShortcodes: true
-# enableRobotsTXT: true
-# buildDrafts: false
-# buildFuture: false
-# buildExpired: false
-# enableEmoji: true
-# pygmentsUseClasses: true
-# mainsections: ["posts", "papermod"]
+enableInlineShortcodes: true
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+enableEmoji: true
+pygmentsUseClasses: true
+mainsections: ["posts", "papermod"]
 
 # minify:
 #   disableXML: true
