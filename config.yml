@@ -136,31 +136,31 @@ enableEmoji: true
 pygmentsUseClasses: true
 mainsections: ["posts", "papermod"]
 
-# minify:
-#   disableXML: true
-#   # minifyOutput: true
+minify:
+  disableXML: true
+  # minifyOutput: true
 
-# languages:
-#   en:
-#     languageName: "English"
-#     weight: 1
-#     taxonomies:
-#       category: categories
-#       tag: tags
-#       series: series
-#     menu:
-#       main:
-#         - name: Archive
-#           url: archives
-#           weight: 5
-#         - name: Search
-#           url: search/
-#           weight: 10
-#         - name: Tags
-#           url: tags/
-#           weight: 10
-#         - name: WiKi
-#           url: https://github.com/adityatelange/hugo-PaperMod/wiki/
+languages:
+  en:
+    languageName: "English"
+    weight: 1
+    taxonomies:
+      category: categories
+      tag: tags
+      series: series
+    menu:
+      main:
+        - name: Archive
+          url: archives
+          weight: 5
+        - name: Search
+          url: search/
+          weight: 10
+        - name: Tags
+          url: tags/
+          weight: 10
+        - name: WiKi
+          url: https://github.com/adityatelange/hugo-PaperMod/wiki/
 
 #   fr:
 #     languageName: ":fr:"
