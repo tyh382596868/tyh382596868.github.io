@@ -1,12 +1,41 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>tyh&#39;s notes</title>
-    <link>https://tyh382596868.github.io/</link>
-    <description>Recent content on tyh&#39;s notes</description>
-    <generator>Hugo</generator>
+    <title>ExampleSite</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on ExampleSite</description>
+    <image>
+      <title>ExampleSite</title>
+      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- 0.140.2</generator>
     <language>en</language>
-    <lastBuildDate></lastBuildDate>
-    <atom:link href="https://tyh382596868.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 10 Jan 2025 14:48:52 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>My First Post</title>
+      <link>http://localhost:1313/posts/my-first-post/</link>
+      <pubDate>Fri, 10 Jan 2025 14:48:52 +0800</pubDate>
+      <guid>http://localhost:1313/posts/my-first-post/</guid>
+      <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;This is &lt;strong&gt;bold&lt;/strong&gt; text, and this is &lt;em&gt;emphasized&lt;/em&gt; text.&lt;/p&gt;
+&lt;p&gt;Visit the &lt;a href=&#34;https://gohugo.io&#34;&gt;Hugo&lt;/a&gt; website!&lt;/p&gt;
+&lt;h2 id=&#34;网站架构&#34;&gt;网站架构&lt;/h2&gt;
+&lt;p&gt;主流静态网站框架有Hugo、Hexo、以及Github的亲儿子jekyll，最终我选择了Hugo框架，因为Hugo官网中的主题看起来更漂亮一点。&lt;/p&gt;
+&lt;p&gt;在挑选主题的时候，我在&lt;a href=&#34;https://themes.gohugo.io/themes/loveit/&#34;&gt;LoveIt&lt;/a&gt;和&lt;a href=&#34;https://themes.gohugo.io/themes/hugo-papermod/&#34;&gt;PaperMod&lt;/a&gt;之间犹豫了很久，甚至把两个主题都尝试搭了一遍，最终选择了更为简洁大方的PaperMod。&lt;/p&gt;
+&lt;p&gt;最终敲定的网站架构使用Github pages作为存储服务，并提供Web访问，Hugo作为静态博客框架，PaperMod作为Hugo的主题，并搭配Github Actions进行自动编译与发布。&lt;/p&gt;
+&lt;p&gt;发布一篇文章的流程是这样的：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;本地使用Markdown撰写一篇文章&lt;/li&gt;
+&lt;li&gt;通过git同步至github仓库&lt;/li&gt;
+&lt;li&gt;Github Actions自动编译成静态站点并部署至Github Pages&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;配置hugo&#34;&gt;配置Hugo&lt;/h2&gt;
+&lt;h3 id=&#34;安装git&#34;&gt;安装Git&lt;/h3&gt;
+&lt;p&gt;Windows只需安装&lt;a href=&#34;https://git-scm.com/download/win&#34;&gt;Git for windows&lt;/a&gt;即可。&lt;/p&gt;
+&lt;p&gt;其它系统可以自行参考Git &lt;a href=&#34;https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-%E5%AE%89%E8%A3%85-Git&#34;&gt;官方文档&lt;/a&gt; 安装。&lt;/p&gt;
+&lt;h3 id=&#34;安装hugo&#34;&gt;安装Hugo&lt;/h3&gt;</description>
+    </item>
   </channel>
 </rss>
