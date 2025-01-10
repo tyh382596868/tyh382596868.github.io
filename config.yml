@@ -13,32 +13,15 @@ minify:
   minifyOutput: true
 
 params:
-  env: production # to enable google analytics, opengraph, twitter-cards and schema.
-  title: ExampleSite
-  description: "ExampleSite description"
-  keywords: [Blog, Portfolio, PaperMod]
-  author: Me
-  # author: ["Me", "You"] # multiple authors
-  images: ["<link or path of image for opengraph, twitter-cards>"]
-  DateFormat: "January 2, 2006"
-  defaultTheme: auto # dark, light
-  disableThemeToggle: false
+  title: "tyh's notes" # 首页标题
+  description: "learning notes" # 页面描述
+  keywords: [VLA, Skill Learning] # 首页的关键词
+  author: tyh # 文章中默认显示的作者名字
+  DateFormat: "2025-01-10" # 将时间格式修改为国内常用格式
+  ShowCodeCopyButtons: true # 显示复制代码按钮
+  showtoc: true # 在每篇文章开头显示目录
 
-  ShowReadingTime: true
-  ShowShareButtons: true
-  ShowPostNavLinks: true
-  ShowBreadCrumbs: true
-  ShowCodeCopyButtons: false
-  ShowWordCount: true
-  ShowRssButtonInSectionTermList: true
-  UseHugoToc: true
-  disableSpecial1stPost: false
-  disableScrollToTop: false
-  comments: false
-  hidemeta: false
-  hideSummary: false
-  showtoc: false
-  tocopen: false
+
 
   assets:
     # disableHLJS: true # to disable highlight.js
