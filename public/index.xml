@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>tyh&#39;s blog</title>
+    <link>https://tyh382596868.github.io/</link>
+    <description>Recent content on tyh&#39;s blog</description>
+    <image>
+      <title>tyh&#39;s blog</title>
+      <url>https://tyh382596868.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>https://tyh382596868.github.io/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- 0.147.9</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 18 Nov 2025 20:37:29 +0800</lastBuildDate>
+    <atom:link href="https://tyh382596868.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Code of DDPM and DDIM</title>
+      <link>https://tyh382596868.github.io/posts/ddpm_ddim_code/</link>
+      <pubDate>Tue, 18 Nov 2025 20:37:29 +0800</pubDate>
+      <guid>https://tyh382596868.github.io/posts/ddpm_ddim_code/</guid>
+      <description>&lt;h1 id=&#34;ddpm&#34;&gt;DDPM&lt;/h1&gt;
+&lt;h2 id=&#34;公式&#34;&gt;公式&lt;/h2&gt;
+&lt;p&gt;✅ 公式 (15)
+&lt;/p&gt;
+$$
+x_0 \approx \hat{x}_0 
+= \frac{x_t - \sqrt{1-\bar{\alpha}_t}\,\epsilon_\theta(x_t)}
+       {\sqrt{\bar{\alpha}_t}}
+\tag{15}
+$$&lt;p&gt;✅ 公式 (6)
+&lt;/p&gt;
+$$
+q(x_{t-1} \mid x_t, x_0)
+= \mathcal{N}\bigl(x_{t-1};\; \mu_t(x_t, x_0),\; \tilde{\beta}_t I\bigr)
+\tag{6}
+$$&lt;p&gt;
+✅ 公式 (7)
+&lt;/p&gt;
+$$
+\mu_t(x_t, x_0)
+:= 
+\frac{\sqrt{\bar{\alpha}_{t-1}}\,\beta_t}{1-\bar{\alpha}_t}\, x_0
++
+\frac{\sqrt{\bar{\alpha}_t}\,(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}\, x_t,
+\quad
+\tilde{\beta}_t := \frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t}\,\beta_t
+\tag{7}
+$$&lt;h2 id=&#34;code&#34;&gt;Code&lt;/h2&gt;
+&lt;p&gt;1.计算 $\bar{\alpha}_t, \bar{\alpha}_{t-1}, \alpha_t$&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;timestep&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;prev_t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;bp&#34;&gt;self&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;previous_timestep&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 1. compute alphas, betas&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;alpha_prod_t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;bp&#34;&gt;self&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;alphas_cumprod&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;alpha_prod_t_prev&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;bp&#34;&gt;self&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;alphas_cumprod&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;prev_t&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;prev_t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;bp&#34;&gt;self&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;one&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;beta_prod_t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;alpha_prod_t&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;beta_prod_t_prev&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;alpha_prod_t_prev&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;current_alpha_t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;alpha_prod_t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;alpha_prod_t_prev&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;current_beta_t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;current_alpha_t&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;2.计算&lt;/p&gt;
+$$
+x_0 \approx \hat{x}_0 
+= \frac{x_t - \sqrt{1-\bar{\alpha}_t}\,\epsilon_\theta(x_t)}
+       {\sqrt{\bar{\alpha}_t}}
+\tag{15}
+$$&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;c1&#34;&gt;# 2. compute predicted original sample from predicted noise also called&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;c1&#34;&gt;# &amp;#34;predicted x_0&amp;#34; of formula (15) from https://huggingface.co/papers/2006.11239&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;pred_original_sample&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sample&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;beta_prod_t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;**&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;0.5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;model_output&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;alpha_prod_t&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;**&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;0.5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;3.计算公式（7）里的$x_0和x_t前边的系数$  $\frac{\sqrt{\bar{\alpha}_{t-1}}\,\beta_t}{1-\bar{\alpha}_t}$ 和 $\frac{\sqrt{\bar{\alpha}_t}\,(1-\bar{\alpha}_{t-1})}{1-\bar{\alpha}_t}$&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>hugo Render math</title>
+      <link>https://tyh382596868.github.io/posts/render_math/</link>
+      <pubDate>Tue, 18 Nov 2025 19:44:05 +0800</pubDate>
+      <guid>https://tyh382596868.github.io/posts/render_math/</guid>
+      <description>&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;config.yml 里启用了 Goldmark 的 renderer.unsafe 和 extensions.passthrough，允许 $$...$$/$...$/\[...\] 等分隔符在 Markdown 中原样输出，避免被转义
+&lt;/code&gt;&lt;/pre&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nt&#34;&gt;markup&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;goldmark&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;renderer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;unsafe&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;extensions&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;passthrough&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;enable&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;delimiters&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;          &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;block&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;- - &lt;span class=&#34;s2&#34;&gt;&amp;#34;\\[&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;              &lt;/span&gt;- &lt;span class=&#34;s2&#34;&gt;&amp;#34;\\]&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;- - &lt;span class=&#34;s2&#34;&gt;&amp;#34;$$&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;              &lt;/span&gt;- &lt;span class=&#34;s2&#34;&gt;&amp;#34;$$&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;          &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;inline&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;- - &lt;span class=&#34;s2&#34;&gt;&amp;#34;\\(&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;              &lt;/span&gt;- &lt;span class=&#34;s2&#34;&gt;&amp;#34;\\)&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;- - &lt;span class=&#34;s2&#34;&gt;&amp;#34;$&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;              &lt;/span&gt;- &lt;span class=&#34;s2&#34;&gt;&amp;#34;$&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;新增 layouts/partials/math.html，通过 PaperMod 的 extend_head.html 自动注入 KaTeX CSS/JS，并在页面加载后调用 renderMathInElement 统一渲染数学公式，同时忽略 pre/code 等标签避免误渲染&lt;/p&gt;
+&lt;p&gt;layouts/partials/math.html&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-html&#34; data-lang=&#34;html&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;{{- $katexVersion := &amp;#34;0.16.11&amp;#34; -}}
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;link&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;rel&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;stylesheet&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;href&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;https://cdn.jsdelivr.net/npm/katex@{{ $katexVersion }}/dist/katex.min.css&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;crossorigin&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;anonymous&amp;#34;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;/&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;script&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;defer&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;src&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;https://cdn.jsdelivr.net/npm/katex@{{ $katexVersion }}/dist/katex.min.js&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;crossorigin&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;anonymous&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;script&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;script&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;defer&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;src&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;https://cdn.jsdelivr.net/npm/katex@{{ $katexVersion }}/dist/contrib/auto-render.min.js&amp;#34;&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;crossorigin&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;anonymous&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;script&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;script&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nb&#34;&gt;document&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;addEventListener&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;DOMContentLoaded&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;function&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;typeof&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;renderMathInElement&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!==&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;function&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nx&#34;&gt;renderMathInElement&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;document&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;body&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;nx&#34;&gt;delimiters&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;left&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;$$&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;right&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;$$&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;display&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;left&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;$&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;right&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;$&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;display&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;left&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;\\(&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;right&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;\\)&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;display&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;left&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;\\[&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;right&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;\\]&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;display&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;nx&#34;&gt;ignoredTags&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;script&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;noscript&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;style&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;textarea&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;pre&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;code&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;nx&#34;&gt;throwOnError&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;script&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;themes/PaperMod/layouts/partials/extend_head.html&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Real-Time Execution of Action Chunking Flow Policies</title>
+      <link>https://tyh382596868.github.io/posts/rtc/</link>
+      <pubDate>Tue, 18 Nov 2025 15:33:51 +0800</pubDate>
+      <guid>https://tyh382596868.github.io/posts/rtc/</guid>
+      <description>&lt;h4 id=&#34;11-同步推理一台服务器同时跑模型的推理与动作的执行一次只能干一件事情模型推理过程中机械臂不执行了会导致动作的卡顿&#34;&gt;1.1 同步推理：一台服务器，同时跑模型的推理与动作的执行。一次只能干一件事情，模型推理过程中机械臂不执行了，会导致动作的卡顿。&lt;/h4&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/RTC/e95f847b62e9fc0d436f58d5634c77d6.png&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;12-异步推理两台服务器一台跑模型的推理一台跑机械臂的动作的执行action-chunk里有n个动作执行k小于等于n个动作后执行端将观测发给推理端模型开始推理同时动作继续执行经过inference-delay延时后模型将新的动作发给执行端&#34;&gt;1.2 异步推理：两台服务器，一台跑模型的推理，一台跑机械臂的动作的执行。action chunk里有n个动作，执行k小于等于n个动作后执行端将观测发给推理端，模型开始推理，同时动作继续执行。经过inference delay延时后，模型将新的动作发给执行端。&lt;/h4&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/RTC/3e48da357d3b3547d255b0614e38acc3.png&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;21-推理延迟&#34;&gt;2.1 推理延迟&lt;/h4&gt;
+&lt;p&gt;什么是推理延迟？
+左图中是一个避障的任务，灰色的部分是障碍物。上一个动作是从上面避障，在上一个动作执行k个动作后，模型开始推理，推理的结果是向下避障。如果推理能立马完成，下一个动作立马执行没什么问题，但是由于推理不能立马完成有个inference delay，在推理完成时，上一个动作已经执行部分了，切换到下一个动作会跳变。
+&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/RTC/00fd4e3cb24fb60d9332755ce47eb4b1.png&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;22-如何解决推理延迟&#34;&gt;2.2 如何解决推理延迟？&lt;/h4&gt;
+&lt;p&gt;参考图像 Inpainting的方法，inference delay期间上一个动作中肯定会执行的部分看成是原图中没mask掉好的部分，可调整的的部分看成是原图中mask掉退化的图像的部分，可以自由发挥，可调整部分指数衰减，长度不够填充部分权重为零，这也叫做soft mask。
+&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/RTC/77bc6a310147e6392ae4ce3316b73460.png&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;23-代码实现&#34;&gt;2.3 代码实现&lt;/h4&gt;
+&lt;p&gt;$x_0$ 是高斯纯噪声，算出中间过程中带噪声的动作$x_t$ , 由训练的flow matching模型得到速度场$v_t$ ,正常是得到下一时刻去噪的action $x_{t+1}$.
+RTC中加了个约束，最终生成的干净的action $x_1$ , 在inference delay部分要与上一个action chunk保持一致。
+如何加入这个约束的呢？
+先根据当前带噪声动作$x_t$,和速度场$v_t$得到一个理论上的最终动作$\bar{x_1}$,
+$\bar{x_1}$对$x_t$求导得到Jacobian矩阵，
+将$\bar{x_1}$与$x_{prev}$做差得到error，乘以一个soft mask权重，
+将error与Jocobian做VJP（Vector Jacobian Product）,并更新$v_t$到$v_t&#39;$
+根据更新后的$v_t&#39;$和当前带噪声动作$x_t$得到下一步动作$x_{t+1}$
+&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/RTC/1a0d1457966211422b7a5a5444fc5950.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/RTC/b0f10f68b436003dba0eefd3f4f93f34.png&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;31-雅可比矩阵与向量雅可比矩阵积&#34;&gt;3.1 雅可比矩阵与向量雅可比矩阵积&lt;/h4&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/RTC/1aeb003baaf39bfac33e8437428421a0.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/RTC/88362327f78a5011578a91084fa5f0a4.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/RTC/33759cd7ecfa4ee25e822fe6b30ad009.png&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;reference&#34;&gt;Reference&lt;/h4&gt;
+&lt;p&gt;RTC blog&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.physicalintelligence.company/research/real_time_chunking&#34;&gt;https://www.physicalintelligence.company/research/real_time_chunking&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Training-free Linear Image Inverses via Flows 论文&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://arxiv.org/abs/2310.04432&#34;&gt;https://arxiv.org/abs/2310.04432&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;介绍雅可比矩阵&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://wangkuiyi.github.io/jacobian.html&#34;&gt;https://wangkuiyi.github.io/jacobian.html&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Transformer</title>
+      <link>https://tyh382596868.github.io/posts/transformer/</link>
+      <pubDate>Mon, 17 Nov 2025 12:42:22 +0800</pubDate>
+      <guid>https://tyh382596868.github.io/posts/transformer/</guid>
+      <description>&lt;h1 id=&#34;transformer&#34;&gt;Transformer&lt;/h1&gt;
+&lt;p&gt;大语言模型要具有复杂理解以及生成人类语言的能力。大语言模型不是为特定的语言任务所设计而是具有更广泛的通用能力。大语言模型的成功归因于Transformer架构，以及用于训练的海量数据。&lt;/p&gt;
+&lt;p&gt;通过编写代码基于Transformer架构实现类似ChatGPT的大语言模型。&lt;/p&gt;
+&lt;p&gt;大语言模型的大既指参数量规模，又指海量数据。&lt;/p&gt;
+&lt;p&gt;Transformer很重要的一点是它能够选择性的关注输入的不同部分。关键组件是self-attention，能够衡量输入序列中每个token相对于其他token的相对重要性。&lt;/p&gt;
+&lt;p&gt;大语言模型的构建包含pretraining and fine-tuning两个阶段。pretraining阶段是在海量unlabeled text data上进行self-supervised learning，去学到一些general represention。fine-tuning是train on labeled data。&lt;/p&gt;
+&lt;p&gt;Transformer分为encoder和decoder部分。encoder负责将输入序列编码成a series of numerical representations or vectors that capture the contextual information of the input，解码器根据当前的these encoded vectors以及当前输入完成下一个词的预测。&lt;/p&gt;
+&lt;p&gt;实现预训练的代码、复用公开可用的预训练模型&lt;/p&gt;
+&lt;p&gt;The next-word prediction task是一种自监督学习，不需要为训练数据提供标签，他利用数据自身的结构。用文本中的下一个词作为要训练的标签。&lt;/p&gt;
+&lt;p&gt;Autoregressive models整合早先的输出作为未来预测的输入。&lt;/p&gt;
+&lt;p&gt;original transformer 的encoder和decoder重复6次。GPT-3有96层transformer layers 以及175b的parameters。&lt;/p&gt;
+&lt;p&gt;emergent behavior：是模型能够执行未被显示训练的任务的能力。&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;image.png&#34; loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/Transformer/image.png&#34;&gt;&lt;/p&gt;
+&lt;h3 id=&#34;working-with-text-data&#34;&gt;&lt;em&gt;&lt;strong&gt;Working with text data&lt;/strong&gt;&lt;/em&gt;&lt;/h3&gt;
+&lt;p&gt;🍎the required steps for preparing the embeddings used by an LLM&lt;/p&gt;
+&lt;p&gt;splitting text into individual word and subword tokens&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Score Based Generative Models</title>
+      <link>https://tyh382596868.github.io/posts/score-based_generative_models/</link>
+      <pubDate>Thu, 06 Nov 2025 20:51:51 +0800</pubDate>
+      <guid>https://tyh382596868.github.io/posts/score-based_generative_models/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=wMmqCMwuM2Q&#34;&gt;https://www.youtube.com/watch?v=wMmqCMwuM2Q&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=B4oHJpEJBAA&#34;&gt;https://www.youtube.com/watch?v=B4oHJpEJBAA&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://scorebasedgenerativemodeling.github.io/&#34;&gt;https://scorebasedgenerativemodeling.github.io/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://yang-song.net/blog/2021/score/&#34;&gt;https://yang-song.net/blog/2021/score/&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;使用“基于得分的生成模型”这个术语，是希望强调它们与得分函数之间的关系。&lt;/p&gt;
+&lt;p&gt;得分函数被定义为对数概率密度的梯度。&lt;/p&gt;
+&lt;p&gt;统计学和机器学习中的典型假设是，训练数据中的所有数据点都来自某种潜在的数据分布。换句话说，这些数据点基本上是从该数据分布中独立抽取的样本，但我们并没有数据分布的解析形式，我们需要对其进行估计。&lt;/p&gt;
+&lt;p&gt;为了估计这个数据分布，我们需要创建一个模型。这个模型表示了一个参数化的概率分布，我们称之为模型分布。我们希望调整这个模型的参数，以确保它在某种意义上接近数据分布。&lt;/p&gt;
+&lt;p&gt;如果模型分布非常接近数据分布，那么我们可以将这个模型用于许多重要的应用。例如，当然，我们可以通过从这个模型分布中采样来生成无限数量的新的数据点。&lt;/p&gt;
+&lt;p&gt;另一个应用是，我们可以使用这个模型分布来计算任何潜在数据点的概率值。举个例子，对于一个数据点，比如一张吉娃娃的照片，因为它是一张狗的照片，所以它实际上属于我们的数据分布。因此，这个模型分布通常会为这样的数据点分配较高的概率值。对于一些不相关的数据点，比如一张松饼的照片，因为它不是狗的照片，一个好的模型分布会为这种图片分配较低的概率值。因为这个模型分布提供了一种生成新的数据点的方式，所以我们也将其称为生成模型。&lt;/p&gt;
+&lt;p&gt;模型提供了一组概率分布族。我们希望通过最小化 $𝑃_𝜃$与 $𝑃_{data}$ 之间的距离，从这个庞大的分布族中找到一个特定的概率分布。之后，我们就可以从 $𝑃_{data}$ 中生成样本。&lt;/p&gt;
+&lt;p&gt;数据分布可能非常复杂，尤其是当数据维度很高时。因此，我们必须构建一个非常强大的模型分布，才能估计我们的数据分布。那么，如何构建一个强大的模型分布呢？&lt;/p&gt;
+&lt;p&gt;得分函数：得分函数用于表示我们的概率分布。那么，什么是得分函数呢？假设我们有一个连续的概率分布，使用 𝑝(𝑥) 来表示概率密度函数。我们将得分函数定义为对 log⁡𝑝(𝑥) 的梯度。注意这个梯度是相对于随机变量 𝑥 计算的——它不是相对于任何模型参数（如 𝜃）计算的。&lt;/p&gt;
+&lt;p&gt;score function:从直觉上来说，分数函数也非常有意义：它告诉你，为了让某个数据点的概率变高，你应该往哪个方向移动它。真实的分数函数可以告诉你，在数据空间中的任意点，你应当往哪个方向移动，才能更接近真实数据点。&lt;/p&gt;
+&lt;p&gt;得分函数长什么样子呢？我们来看一个简单的例子，即两个高斯分布的混合。这个图展示了这个高斯混合分布的密度函数和得分函数。密度函数用颜色编码，颜色越深表示密度越高。得分函数是一个向量场，给出了密度函数增长最快的方向。给定密度函数，我们可以非常容易地计算得分函数，因为我们只需要对其进行求导。相反，利用得分函数，我们也可以通过计算积分来恢复密度函数。因此它们在理论上是等价的。但是在计算上，与密度函数相比，得分函数要更容易处理。
+&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/eba18f8093138db297ea4d6b6a78350e.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;得分模型：根据我们在统计学中的知识，我们知道可以训练一个适当归一化的统计模型，使用如最大似然估计等方法来估计潜在的数据密度。但因为我们想使用得分函数，我们希望开发一个类似的方法，使我们能够训练我们的得分模型来估计潜在的得分函数，且只需一个有限的训练数据集。&lt;/p&gt;
+&lt;p&gt;从数学角度来看，我们给定一组数据点，假设这些数据点是从数据分布 $P_{\text{data}}​$ 中独立采样的。我们的目标是估计数据密度的得分函数。我们给定一个得分模型，这个模型假设是一个深度神经网络模型，能够将高维输入映射到高维输出，并且我们希望训练这个得分模型，使其近似于数据分布的真实得分函数。那么，如何训练这个得分模型，使其接近我们的真实数据得分函数呢？我们需要最小化某个目标函数。这个目标函数必须比较得分函数的两个向量场。这里，一个向量场是数据得分函数的真实值，另一个向量场是由我们的得分模型预测的。我们如何比较它们之间的差异呢？我们回顾一下，这两个向量场实际上位于相同的空间中。因此，我们可能能够计算这些向量对之间的差异向量，然后我们可以对这些差异向量的密度进行积分，形成一个标量值的目标函数。
+&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/fb33945828784ed2ac22b9428dd85181.png&#34;&gt;
+Fisher divergence:&lt;/p&gt;
+&lt;p&gt;score matching:指的是用我们预测的分数 $𝑠_𝜃(𝑥)$去逼近原始分布的真实分数。这基本上意味着我们试图最小化真实分数和预测分数之间的差异&lt;/p&gt;
+&lt;p&gt;雅可比矩阵:&lt;/p&gt;
+&lt;p&gt;切片得分匹配（sliced score matching）: 基本的直觉是，一维问题应该比高维问题更容易解决。那么，我们如何将高维问题转换为一维问题呢？我们可以利用随机投影。我们将高维向量场投影到随机方向上。然后我们得到一维标量场。假设这两个高维向量场相互接近。那么我们可以沿着随机的一维方向投影它们。这样，我们就得到了接近的标量场。&lt;/p&gt;
+&lt;p&gt;denoising score matching：模型在训练时需要从带噪输入中预测负噪声。而预测负噪声的方向恰好是 朝向真实数据分布的方向——这正是“分数”的含义：告诉你朝哪里走概率更大。
+&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/74ce29358bb6edc7fcd8bebe66960248.png&#34;&gt;
+给定一个大的训练数据集，我们可以使用基于原则的统计方法，如得分匹配，来训练我们的得分模型，以估计潜在的得分函数。为了构建我们的生成模型，我们必须找到一种方法，通过得分函数的向量场来生成新的数据点。假设我们已经给定了得分函数。想象一下有许多随机点散布在楼梯上。我们能否通过移动这些随机点来从得分函数中形成样本呢？可以通过跟随得分函数预测的方向来移动这些点。然而，这并不能给我们有效的样本，因为这些点最终会聚集在一起。将高斯噪声注入到得分函数中，并跟随这些噪声扰动的得分函数。
+&lt;img loading=&#34;lazy&#34; src=&#34;https://tyh382596868.github.io/attachment/4357572873230a1e389e819d78b8d96f.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;得分匹配可以估计数据的得分函数，Langevin 动力学可以从得分函数中生成样本。所以，用我们的得分模型替换 Langevin 动力学中的得分函数就变得非常自然了，然后我们就可以生成数据样本——从而定义一个新的生成模型。&lt;/p&gt;
+&lt;p&gt;Langevin 动力学：&lt;/p&gt;
+&lt;p&gt;score matching can estimate the score function data. And Langevin dynamics can generate samples from the score function. So it becomes very, very natural to just replace the score
+function in Langevin dynamics with our score model, and then we can generate data samples&amp;ndash;we define a new generative model.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Math Code Block</title>
+      <link>https://tyh382596868.github.io/posts/my-first-posts/</link>
+      <pubDate>Wed, 26 Oct 2022 09:30:05 -0700</pubDate>
+      <guid>https://tyh382596868.github.io/posts/my-first-posts/</guid>
+      <description>&lt;h2 id=&#34;example-1-block&#34;&gt;Example 1 (block)&lt;/h2&gt;
+$$
+a^*=x-b^*
+$$&lt;h2 id=&#34;example-2-block&#34;&gt;Example 2 (block)&lt;/h2&gt;
+$$
+\begin{array} {lcl}
+  L(p,w_i) &amp;=&amp; \dfrac{1}{N}\Sigma_{i=1}^N(\underbrace{f_r(x_2
+  \rightarrow x_1
+  \rightarrow x_0)G(x_1
+  \longleftrightarrow x_2)f_r(x_3
+  \rightarrow x_2
+  \rightarrow x_1)}_{sample\, radiance\, evaluation\, in\, stage2}
+  \\\\\\ &amp;=&amp;
+  \prod_{i=3}^{k-1}(\underbrace{\dfrac{f_r(x_{i+1}
+  \rightarrow x_i
+  \rightarrow x_{i-1})G(x_i
+  \longleftrightarrow x_{i-1})}{p_a(x_{i-1})}}_{stored\,in\,vertex\, during\,light\, path\, tracing\, in\, stage1})\dfrac{G(x_k
+  \longleftrightarrow x_{k-1})L_e(x_k
+  \rightarrow x_{k-1})}{p_a(x_{k-1})p_a(x_k)})
+\end{array}
+$$</description>
+    </item>
+  </channel>
+</rss>
