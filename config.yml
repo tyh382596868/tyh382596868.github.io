@@ -26,6 +26,9 @@ params:
   defaultTheme: auto # dark, light
   disableThemeToggle: false
 
+# ✨✨✨ 关键：开启数学公式支持（PaperMod） ✨✨✨
+  math: true  
+
   ShowReadingTime: true
   ShowShareButtons: true
   ShowPostNavLinks: true
@@ -129,6 +132,24 @@ menu:
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: true
 markup:
+  goldmark:
+    renderer:
+      unsafe: true
+    extensions:
+      passthrough:
+        enable: true
+        delimiters:
+          block:
+            - - "\\["
+              - "\\]"
+            - - "$$"
+              - "$$"
+          inline:
+            - - "\\("
+              - "\\)"
+            - - "$"
+              - "$"
+
   highlight:
     noClasses: false
     # anchorLineNos: true
@@ -136,3 +157,5 @@ markup:
     # guessSyntax: true
     # lineNos: true
     # style: monokai
+
+

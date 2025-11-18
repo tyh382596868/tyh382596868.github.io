@@ -1,0 +1,39 @@
+{{- /*
+  KaTeX 注入脚本：PaperMod 的 extend_head.html 会在
+  .Params.math 或 .Site.Params.math 为 true 时包含该 partial。
+  需要搭配 config.yml 中的 goldmark passthrough 设置。
+*/ -}}
+{{- $katexVersion := "0.16.11" -}}
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@{{ $katexVersion }}/dist/katex.min.css"
+  crossorigin="anonymous"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@{{ $katexVersion }}/dist/katex.min.js"
+  crossorigin="anonymous"
+></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@{{ $katexVersion }}/dist/contrib/auto-render.min.js"
+  crossorigin="anonymous"
+></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof renderMathInElement !== "function") {
+      return;
+    }
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+      throwOnError: false,
+    });
+  });
+</script>
+
