@@ -3,6 +3,7 @@ date = '2025-11-18T19:44:05+08:00'
 draft = false
 title = 'hugo Render math'
 +++
+
 ```
 config.yml 里启用了 Goldmark 的 renderer.unsafe 和 extensions.passthrough，允许 $$...$$/$...$/\[...\] 等分隔符在 Markdown 中原样输出，避免被转义
 ```
